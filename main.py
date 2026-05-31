@@ -18,7 +18,10 @@ FEEDS = {
 HISTORY_FILE = "history.json"
 
 # Set up API keys (These will be pulled from GitHub Secrets or local .env)
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
+print(f"DEBUG: Did we find the Gemini Key? {'YES' if api_key else 'NO - It is completely blank!'}")
+
+genai.configure(api_key=api_key)
 SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK_URL")
 model = genai.GenerativeModel('gemini-2.5-flash')
 
