@@ -27,5 +27,5 @@ jobs:
       - name: Run summarizer script
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          # LLM_API_KEY: ${{ secrets.LLM_API_KEY }} # You will add this secret later
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
