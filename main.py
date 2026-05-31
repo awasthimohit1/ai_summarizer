@@ -2,6 +2,7 @@ import os
 import json
 import feedparser
 import requests
+import time
 import google.generativeai as genai
 
 # 1. Configuration
@@ -84,6 +85,10 @@ def main():
                 
                 history.append(link)
                 new_articles_processed = True
+                
+                # Pause for 20 seconds to respect Gemini free tier rate limits
+                print("Sleeping for 20 seconds...")
+                time.sleep(20)
 
     if new_articles_processed:
         save_history(history)
