@@ -80,31 +80,42 @@ def send_to_slack(company, title, summary, link):
 def main():
     history = load_history()
     new_articles_processed = False
-
+    
     for company, url in FEEDS.items():
         feed = feedparser.parse(url)
         
-        # Check the latest article in the feed
-        if feed.entries:
-            latest = feed.entries[0]
+        # Scan the top 5 latest articles instead of just index 0
+        # This catches multiple updates and prevents sync gaps
+        for latest in feed.entries[:5]:
             entry_id = get_entry_id(latest)
+            title = latest.title.strip() if latest.title else ""
             link = latest.link
             
-            if entry_id not in history:
-                print(f"Processing new article from {company}: {latest.title}")
+            # Create two unique keys to check against history
+            # (Tracks both URL and Title to prevent dynamic URL duplication)
+            title_key = f"title:{title}"
+            
+            if entry_id not in history and title_key not in history:
+                print(f"Processing new article from {company}: {title}")
                 
-                # Some feeds put content in 'summary', others in 'content'
-                content = latest.summary if 'summary' in latest else latest.title
+                # Extract content reliably
+                content = latest.summary if 'summary' in latest else title
                 summary = generate_summary(content)
                 
-                send_to_slack(company, latest.title, summary, link)
+                send_to_slack(company, title, summary, link)
                 
+                # Add both identifiers to history
                 history.append(entry_id)
+                history.append(title_key)
                 new_articles_processed = True
                 
                 # Pause for 20 seconds to respect Gemini free tier rate limits
                 print("Sleeping for 20 seconds...")
                 time.sleep(20)
+            else:
+                # Since feeds are ordered newest to oldest, if we hit an article 
+                # we already processed, we can skip the remaining older ones for this feed.
+                break
 
     if new_articles_processed:
         save_history(history)
