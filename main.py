@@ -25,7 +25,7 @@ print(f"DEBUG: Did we find the Gemini Key? {'YES' if api_key else 'NO - It is co
 
 genai.configure(api_key=api_key)
 SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK_URL")
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-3-flash-preview')
 
 def load_history():
     if os.path.exists(HISTORY_FILE):
