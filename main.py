@@ -3,6 +3,7 @@ import json
 import feedparser
 import requests
 import time
+from urllib.parse import urlparse, urlunparse
 import google.generativeai as genai
 
 # 1. Configuration
@@ -35,6 +36,20 @@ def load_history():
 def save_history(history):
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f)
+
+def get_entry_id(entry):
+    # Use entry.id (GUID) if available and not empty, otherwise fallback to entry.link
+    identifier = getattr(entry, 'id', None) or getattr(entry, 'link', '')
+    
+    # If it's a URL, normalize it by removing query parameters and fragments
+    if identifier.startswith("http://") or identifier.startswith("https://"):
+        try:
+            parsed = urlparse(identifier)
+            # Reconstruct without query parameters or fragment
+            identifier = urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, '', ''))
+        except Exception:
+            pass
+    return identifier.strip()
 
 def generate_summary(text):
     prompt = f"Summarize this engineering blog post in 3-4 crisp bullet points. Focus on the core tech and ML takeaways:\n\n{text}"
@@ -72,9 +87,10 @@ def main():
         # Check the latest article in the feed
         if feed.entries:
             latest = feed.entries[0]
+            entry_id = get_entry_id(latest)
             link = latest.link
             
-            if link not in history:
+            if entry_id not in history:
                 print(f"Processing new article from {company}: {latest.title}")
                 
                 # Some feeds put content in 'summary', others in 'content'
@@ -83,7 +99,7 @@ def main():
                 
                 send_to_slack(company, latest.title, summary, link)
                 
-                history.append(link)
+                history.append(entry_id)
                 new_articles_processed = True
                 
                 # Pause for 20 seconds to respect Gemini free tier rate limits
