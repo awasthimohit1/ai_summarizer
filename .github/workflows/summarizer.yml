@@ -9,6 +9,8 @@ on:
 jobs:
   run-summarizer:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -29,3 +31,14 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
+
+      - name: Commit and push history
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f history.json ]; then
+            git add history.json
+            git commit -m "chore: update history.json [skip ci]" && git push || echo "No changes to commit"
+          else
+            echo "history.json not found, skipping commit."
+          fi
