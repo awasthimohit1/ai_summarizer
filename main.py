@@ -29,7 +29,7 @@ class BlogExtraction(BaseModel):
 FEEDS = {
     "Meta": "https://engineering.fb.com/feed/",
     "Apple": "https://machinelearning.apple.com/",
-    "Google AI": "https://research.google/blog/",
+    "Google AI": "https://research.google/blog/label/generative-ai/",
     "Netflix": "https://research.netflix.com/archive",
     "Airbnb": "https://medium.com/airbnb-engineering/subpage/fa81dc8a53b3", #"https://airbnb.tech/",
     "Thinking Machines": "https://thinkingmachines.ai/blog/",
