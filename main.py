@@ -48,7 +48,7 @@ SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK_URL")
 if not SLACK_WEBHOOK:
     raise ValueError("🚨 CRITICAL ERROR: SLACK_WEBHOOK_URL is blank!")
 
-MODEL_NAME = "llama-3.3-70b-versatile"
+MODEL_NAME = "openai/gpt-oss-120b"
 
 print("\n" + "="*60)
 print("⚙️  STAGE 1: INITIALIZING SYSTEM PIPELINE CONTEXT")
